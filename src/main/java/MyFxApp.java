@@ -10,8 +10,13 @@ public class MyFxApp extends Application {
         primaryStage.setTitle("My First JavaFX App");
 
         Button button1 = new Button("Button 1");
-        Button button2 = new Button("Button 2");
         button1.getStyleClass().add("button1");
+
+        Button button2 = new Button("Button 2");
+        String styles =
+                "-fx-background-color: #0000ff;" +
+                        "-fx-border-color: #ff0000;" ;
+        button2.setStyle(styles);
 
         VBox vbox = new VBox(button1, button2);
         vbox.getStyleClass().add("vbox");
