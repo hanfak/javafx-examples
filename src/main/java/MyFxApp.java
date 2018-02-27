@@ -10,6 +10,8 @@ public class MyFxApp extends Application {
         // Setting scene
         Label label = new Label("Hello World, JavaFX !");
         Scene scene = new Scene(label, 400, 200);
+        // Setting styling via css
+        scene.getStylesheets().add("button-styles.css");
         primaryStage.setScene(scene);
 
         primaryStage.show();
