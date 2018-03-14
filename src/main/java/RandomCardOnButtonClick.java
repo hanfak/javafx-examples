@@ -1,10 +1,12 @@
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -20,51 +22,85 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.stream.IntStream;
 
-public class FrontCard extends Application {
+public class RandomCardOnButtonClick extends Application {
 
     private final static Color SCENE_BACKGROUND_COLOR = Color.RED.deriveColor(1, 1, 1, 0.8);
+    private Button button;
+    private VBox vBox;
 
+    // TODO: create 2 sets of 5 random cards with in separate hBoxes and change upon click button
+    // If changing hbox/vbox need to clear them all and replace them
     @Override
     public void start(Stage primaryStage) {
 
         Group root = new Group();
-        VBox vBox = new VBox();
+        vBox = new VBox();
         vBox.setPadding(new Insets(10));
         vBox.setSpacing(10);
-        createSetOfCards(vBox);
+
+        HBox hBox = new HBox();
+        createSetOfCards(hBox);
+        createButton(hBox);
+
         root.getChildren().add(vBox);
 
         Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 
         Scene scene = new Scene(root, primScreenBounds.getWidth() - primaryStage.getHeight(), primScreenBounds.getHeight() - primaryStage.getHeight(), SCENE_BACKGROUND_COLOR);
-        primaryStage.setTitle("Deck Of Cards");
+
+        primaryStage.setTitle("Random Card");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void createSetOfCards( VBox vBox) {
-        for (Suit suit : EnumSet.allOf(Suit.class)) {
-            HBox hBox = new HBox();
-            hBox.setSpacing(10);
-            EnumSet.allOf(Rank.class).stream()
-                    .forEach(rank -> {
-                        try {
-                            if (suit.equals(Suit.DIAMOND) || suit.equals(Suit.HEART)) {
-                                Node card = createCard(95, 140, rank.value(), suit.name(), Color.RED);
-                                hBox.getChildren().add(card);
-                            } else {
-                                Node card = createCard(95, 140, rank.value(), suit.name(), Color.BLACK);
-                                hBox.getChildren().add(card);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                );
-            vBox.getChildren().add(hBox);
+    private void createButton(HBox hBox) {
+        button = new Button("Get Random Card");
+        button.setOnAction(event -> buttonAction(event, hBox));
+        button.setPadding(new Insets(10));
+        vBox.getChildren().add(button);
+    }
+
+    private void buttonAction(ActionEvent event, HBox hBox) {
+        if (event.getSource() == button) {
+            hBox.getChildren().clear();
+            createSetOfCards(hBox);
+            createButton(hBox);
+            System.out.println("hello");
         }
+    }
+
+    private void createSetOfCards(HBox hBox) {
+        List<Suit> suits = new ArrayList<>(EnumSet.allOf(Suit.class));
+        List<Rank> ranks = new ArrayList<>(EnumSet.allOf(Rank.class));
+
+        IntStream.range(0, 5).forEach(x -> {
+                    Collections.shuffle(suits);
+                    Collections.shuffle(ranks);
+                    Suit randomSuit = suits.get(0);
+                    Rank randomRank = ranks.get(0);
+
+                    try {
+                        if (randomSuit.equals(Suit.DIAMOND) || randomSuit.equals(Suit.HEART)) {
+                            Node card = createCard(95, 140, randomRank.value(), randomSuit.name(), Color.RED);
+                            hBox.getChildren().add(card);
+                        } else {
+                            Node card = createCard(95, 140, randomRank.value(), randomSuit.name(), Color.BLACK);
+                            hBox.getChildren().add(card);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    vBox.getChildren().clear();
+                    vBox.getChildren().add(hBox);
+
+                }
+        );
     }
 
     @SuppressWarnings("SameParameterValue")
